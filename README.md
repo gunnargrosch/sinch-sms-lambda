@@ -108,6 +108,7 @@ All examples use `to` and `message` as field names. Adapt to match your event sc
 
 ## Resources
 
+- [Blog post: Sending SMS from AWS Lambda](https://dev.to/gunnargrosch/sending-sms-from-aws-lambda-1fk1)
 - [Sinch Conversation API](https://developers.sinch.com/docs/conversation/)
 - [SMS channel setup](https://developers.sinch.com/docs/conversation/channel-support/sms/set-up)
 - [Sinch Node.js SDK](https://developers.sinch.com/docs/sdks/node/)
