@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Sending SMS from AWS Lambda with the Sinch Conversation API
+
+Parameters:
+  SinchRegion:
+    Type: String
+    Default: us
+    AllowedValues: [us, eu]
+  SinchProjectId:
+    Type: String
+  SinchAppId:
+    Type: String
+  SinchSmsSender:
+    Type: String
+  SinchAccessKeyParam:
+    Type: String
+    Default: /sinch/access-key
+  SinchAccessKeySecretParam:
+    Type: String
+    Default: /sinch/access-key-secret
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        SINCH_REGION: !Ref SinchRegion
+        SINCH_PROJECT_ID: !Ref SinchProjectId
+        SINCH_APP_ID: !Ref SinchAppId
+        SINCH_SMS_SENDER: !Ref SinchSmsSender
+        SINCH_ACCESS_KEY_PARAM: !Ref SinchAccessKeyParam
+        SINCH_ACCESS_KEY_SECRET_PARAM: !Ref SinchAccessKeySecretParam
+
+Resources:
+
+  # ── Node.js, raw HTTP (no SDK) ────────────────────────────────────────────
+  NodeHttpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: src/handler.handler
+      CodeUri: node-http/
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ssm:GetParameter
+              Resource:
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeyParam}"
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeySecretParam}"
+      # Uncomment one of the following event sources to wire up a trigger.
+      # Also uncomment the matching handler variant in node-http/src/handler.ts.
+      # Events:
+      #   SQS:
+      #     Type: SQS
+      #     Properties:
+      #       Queue: !GetAtt YourQueue.Arn
+      #       BatchSize: 10
+      #       FunctionResponseTypes:
+      #         - ReportBatchItemFailures
+      #   EventBridge:
+      #     Type: EventBridgeRule
+      #     Properties:
+      #       EventBusName: !Ref YourEventBus
+      #       Pattern:
+      #         source:
+      #           - myapp
+      #         detail-type:
+      #           - SendSms
+      #   SNS:
+      #     Type: SNS
+      #     Properties:
+      #       Topic: !Ref YourSnsTopic
+      #   Api:
+      #     Type: Api
+      #     Properties:
+      #       Path: /send
+      #       Method: post
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        EntryPoints:
+          - src/handler.ts
+
+  # ── Node.js, @sinch/sdk-core ──────────────────────────────────────────────
+  NodeSdkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: src/handler.handler
+      CodeUri: node-sdk/
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ssm:GetParameter
+              Resource:
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeyParam}"
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeySecretParam}"
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        EntryPoints:
+          - src/handler.ts
+
+  # ── Python, raw HTTP (stdlib only) ───────────────────────────────────────
+  PythonHttpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.13
+      Handler: handler.handler
+      CodeUri: python-http/
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ssm:GetParameter
+              Resource:
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeyParam}"
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeySecretParam}"
+
+  # ── Python, sinch SDK ─────────────────────────────────────────────────────
+  PythonSdkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.13
+      Handler: handler.handler
+      CodeUri: python-sdk/
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ssm:GetParameter
+              Resource:
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeyParam}"
+                - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${SinchAccessKeySecretParam}"
+
+Outputs:
+  NodeHttpFunctionName:
+    Description: Node.js raw HTTP function name
+    Value: !Ref NodeHttpFunction
+  NodeSdkFunctionName:
+    Description: Node.js SDK function name
+    Value: !Ref NodeSdkFunction
+  PythonHttpFunctionName:
+    Description: Python raw HTTP function name
+    Value: !Ref PythonHttpFunction
+  PythonSdkFunctionName:
+    Description: Python SDK function name
+    Value: !Ref PythonSdkFunction

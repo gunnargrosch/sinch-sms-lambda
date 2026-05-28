@@ -1,0 +1,17 @@
+{
+  "name": "sinch-sms-lambda",
+  "version": "1.0.0",
+  "description": "Demo: Sending SMS from AWS Lambda with the Sinch Conversation API",
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy --guided"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ssm": "3.821.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.149",
+    "@types/node": "^20.17.57",
+    "typescript": "^5.8.3"
+  }
+}

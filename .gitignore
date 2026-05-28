@@ -1,0 +1,10 @@
+node_modules/
+.aws-sam/
+dist/
+*.env
+.env*
+samconfig.toml
+__pycache__/
+*.pyc
+.venv/
+response.json
