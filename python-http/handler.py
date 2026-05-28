@@ -18,7 +18,7 @@ SINCH_ACCESS_KEY_SECRET_PARAM = os.environ["SINCH_ACCESS_KEY_SECRET_PARAM"]
 
 E164_REGEX = re.compile(r"^\+[1-9]\d{1,14}$")
 
-# Module-level cache — shared across warm invocations regardless of trigger type
+# Module-level cache. Shared across warm invocations regardless of trigger type
 _credentials = None
 _token_cache = {"value": None, "expires_at": 0}
 
