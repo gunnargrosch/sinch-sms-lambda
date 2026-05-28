@@ -2,6 +2,8 @@
 
 Send SMS from AWS Lambda using the [Sinch Conversation API](https://developers.sinch.com/docs/conversation/). Four parallel implementations in TypeScript and Python, with and without the Sinch SDK. Credentials are stored in SSM Parameter Store. The handler can be wired to direct invocation, SQS, EventBridge, SNS, or API Gateway.
 
+Companion blog post: [Sending SMS from AWS Lambda](https://dev.to/gunnargrosch/sending-sms-from-aws-lambda-1fk1)
+
 ## Examples
 
 | Directory | Language | Approach |
